@@ -1,0 +1,19 @@
+{
+  "name": "bridge-error-scanner",
+  "version": "1.0.0",
+  "description": "Scans a list of charts, generates a list of issues that were found, and fixes the ones that can be fixed automatically.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/main.ts",
+    "build": "tsc && npx pkg -t latest-win-x64 -o \"release/Bridge Error Scanner.exe\" dist/main.js"
+  },
+  "author": "Geo",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "pkg": "^5.4.1",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.4.4"
+  }
+}
