@@ -6,14 +6,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/main.ts",
-    "build": "tsc && npx pkg -t latest-win-x64 -o \"release/Bridge Error Scanner.exe\" dist/main.js"
+    "build": "tsc && pkg -t latest-win-x64 -o \"release/Bridge Error Scanner.exe\" dist/main.js"
   },
   "author": "Geo",
   "license": "ISC",
   "devDependencies": {
+    "@types/cli-color": "^2.0.1",
+    "@types/is-valid-path": "^0.1.0",
     "@types/node": "^16.11.6",
+    "@types/readline-sync": "^1.4.4",
     "pkg": "^5.4.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "cli-color": "^2.0.1",
+    "is-valid-path": "^0.1.1",
+    "readline-sync": "^1.4.10"
   }
 }
