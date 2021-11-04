@@ -13,6 +13,8 @@
   "devDependencies": {
     "@types/cli-color": "^2.0.1",
     "@types/is-valid-path": "^0.1.0",
+    "@types/jsonfile": "^6.0.1",
+    "@types/needle": "^2.5.2",
     "@types/node": "^16.11.6",
     "@types/readline-sync": "^1.4.4",
     "pkg": "^5.4.1",
@@ -21,7 +23,10 @@
   },
   "dependencies": {
     "cli-color": "^2.0.1",
+    "googleapis": "^89.0.0",
     "is-valid-path": "^0.1.1",
+    "jsonfile": "^6.1.0",
+    "needle": "^3.0.0",
     "readline-sync": "^1.4.10"
   }
 }
