@@ -18,7 +18,7 @@ export interface IStringifyConfig {
 export interface IIniObject {
   [$NoSection]?: IIniObjectSection
   [section: string]: IIniObjectSection
-  [$Errors]?: Error[]
+  [$Errors]?: string[]
 }
 
 export interface IIniObjectSection {
@@ -27,7 +27,7 @@ export interface IIniObjectSection {
 
 export type IniValue = string | number | boolean
 
-const createParseError = (line: string) => new Error(`Unsupported type of line: "${line}"`)
+const createParseError = (line: string) => `Unsupported type of line: "${line}"`
 const sectionNameRegex = /\[(.+)]$/
 
 export function decode(data: string, params?: IParseConfig) {

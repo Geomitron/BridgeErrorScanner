@@ -41,7 +41,8 @@ class AuthServer {
   private requestListener(req: http.IncomingMessage, res: http.ServerResponse) {
     if (req.url?.includes(REDIRECT_PATH)) {
       const searchParams = new URL(req.url, REDIRECT_BASE).searchParams
-      res.end('Authentication successful! You can now close this window.')
+      res.setHeader('Content-Type', 'text/html')
+      res.end('<h2>Authentication successful! You can now close this window.</h2>')
       this.destroyServer()
       this.callbacks.authCode(searchParams.get('code'))
     }

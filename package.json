@@ -4,7 +4,6 @@
   "description": "Scans a list of charts, generates a list of issues that were found, and fixes the ones that can be fixed automatically.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/main.ts",
     "build": "tsc && copy .\\src\\settings.ini .\\dist\\settings.ini && pkg -t latest-win-x64 -o \"release/Bridge Error Scanner.exe\" dist/main.js"
   },
@@ -14,8 +13,10 @@
     "@types/cli-color": "^2.0.1",
     "@types/is-valid-path": "^0.1.0",
     "@types/jsonfile": "^6.0.1",
+    "@types/mkdirp": "^1.0.2",
     "@types/needle": "^2.5.2",
     "@types/node": "^16.11.6",
+    "@types/progress": "^2.0.5",
     "@types/readline-sync": "^1.4.4",
     "pkg": "^5.4.1",
     "ts-node": "^10.4.0",
@@ -27,7 +28,10 @@
     "googleapis": "^89.0.0",
     "is-valid-path": "^0.1.1",
     "jsonfile": "^6.1.0",
+    "mkdirp": "^1.0.4",
     "needle": "^3.0.0",
-    "readline-sync": "^1.4.10"
+    "progress": "^2.0.3",
+    "readline-sync": "^1.4.10",
+    "sanitize-filename": "^1.6.3"
   }
 }

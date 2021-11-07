@@ -167,7 +167,7 @@ function driveStreamError(fileID: string, description?: string, err?: unknown) {
 
 function getRealFilename(originalFilename: string | null, name: string | null) {
   if (originalFilename == null && name == null) {
-    console.log(redBright('ERROR: Drive returned an unnamed file.'))
+    console.log(redBright('Error: Drive returned an unnamed file.'))
     return 'NAME_UNDEFINED'
   }
 

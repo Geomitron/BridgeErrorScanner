@@ -1,6 +1,8 @@
 import isValidPath from 'is-valid-path'
 import { existsSync } from 'fs'
 import { NamedFolderID } from './ScanSettings'
+import { createHash } from 'crypto'
+import sanitize from 'sanitize-filename'
 
 /**
  * @returns the Drive ID in `link`, or `null` if `link` wasn't a valid Google Drive link.
@@ -15,9 +17,20 @@ export function parseDriveLink(link: string) {
 }
 
 /**
- * @returns `path`, or `null` if `path` wasn't a valid path or it wasn't accessible.
+ * @returns `path`, or `null` if `path` wasn't a valid path.
  */
 export function parseFilepath(path: string) {
+  if (isValidPath(path)) {
+    return path
+  } else {
+    return null
+  }
+}
+
+/**
+ * @returns `path`, or `null` if `path` wasn't a valid path or it wasn't accessible.
+ */
+export function parseExistingFilepath(path: string) {
   if (isValidPath(path) && existsSync(path)) {
     return path
   } else {
@@ -72,6 +85,29 @@ export function appearsToBeChartFolder(extensions: string[]) {
   const containsNotes = (ext.includes('chart') || ext.includes('mid'))
   const containsAudio = (ext.includes('ogg') || ext.includes('mp3') || ext.includes('wav') || ext.includes('opus'))
   return (containsNotes || containsAudio)
+}
+
+/**
+ * @returns `filename` with all invalid filename characters replaced.
+ */
+ export function sanitizeFilename(filename: string): string {
+  const newFilename = sanitize(filename, {
+    replacement: ((invalidChar: string) => {
+      switch (invalidChar) {
+        case '<': return '❮'
+        case '>': return '❯'
+        case ':': return '꞉'
+        case '"': return "'"
+        case '/': return '／'
+        case '\\': return '⧵'
+        case '|': return '⏐'
+        case '?': return '？'
+        case '*': return '⁎'
+        default: return '_'
+      }
+    })
+  })
+  return (newFilename == '' ? createHash(filename).digest('hex').substr(0, 5) : newFilename)
 }
 
 /**

@@ -1,8 +1,8 @@
-import { DriveMap, DriveFile, Source } from '../ScanDataInterface'
+import { DriveMap, DriveFile, Source, DriveChart } from '../ScanDataInterface'
 import { readDriveFolder, readDriveFile } from './DriveAdapter'
 import { createHash } from 'crypto'
 import { green, magentaBright, yellow } from 'cli-color'
-import { appearsToBeChartFolder, driveLink, lower } from '../util'
+import { appearsToBeChartFolder, driveLink, lower } from '../UtilFunctions'
 import { DriveFileResponse, DriveFolderResponse, DriveShortcutResponse } from '../Templates'
 import { NamedFolderID, scanSettings } from '../ScanSettings'
 import { keyInYNStrict } from 'readline-sync'
@@ -157,7 +157,7 @@ export class DriveScanner {
       if (!keyInYNStrict(`Continue downloading the remaining charts?`)) { throw 'Scan cancelled.' }
     }
   
-    return this.simplifyDriveMap(this.results)
+    return this.filterOutOldResults(this.simplifyDriveMap(this.results))
   }
 
   /**
@@ -233,5 +233,43 @@ export class DriveScanner {
     }
 
     return results
+  }
+
+  /**
+   * @returns `driveMap` with the size of each `ChartMap` capped at `scanSettings.maxDownloadsPerDrive`.
+   */
+  private filterOutOldResults(driveMap: DriveMap) {
+    const amountToKeep = scanSettings.maxDownloadsPerDrive
+    if (amountToKeep == -1) { return driveMap }
+    for (const driveID in driveMap) {
+      const sourceCharts = Object.values(driveMap[driveID])
+      const timedSourceCharts = sourceCharts.map(sourceChart => {
+        return { latestTime: this.getLatestTime(sourceChart), ...sourceChart }
+      })
+      const sortedResults = timedSourceCharts.sort((a, b) => a.latestTime - b.latestTime)
+      const len = sortedResults.length
+      const keptResults = amountToKeep >= len ? sortedResults : sortedResults.slice(len - amountToKeep, len)
+      driveMap[driveID] = {}
+      for (const result of keptResults) {
+        driveMap[driveID][result.filesHash] = result
+      }
+    }
+
+    return driveMap
+  }
+
+  /**
+   * @returns the most recent modification date of all the files in `driveChart`, in ms.
+   */
+  private getLatestTime(driveChart: DriveChart) {
+    let max = Number.MIN_SAFE_INTEGER
+    for (const file of driveChart.files) {
+      const thisDate = new Date(file.modifiedTime).getTime()
+      if (max < thisDate) {
+        max = thisDate
+      }
+    }
+
+    return max
   }
 }

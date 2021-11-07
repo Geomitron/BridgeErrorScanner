@@ -4,7 +4,7 @@ import childProcess from 'child_process'
 import { keyInPause } from 'readline-sync'
 import { $Errors, decode, IIniObject, IIniObjectSection } from './ini'
 import { SETTINGS_PATH, SNAPSHOT_SETTINGS_PATH } from './paths'
-import { parseDriveLink, parseDriveLinksText, parseFilepath, parseInt } from './util'
+import { parseDriveLink, parseDriveLinksText, parseExistingFilepath, parseFilepath, parseInt } from './UtilFunctions'
 export const scanSettings: ScanSettings = readSettings()
 
 export interface ScanSettings {
@@ -15,10 +15,13 @@ export interface ScanSettings {
   /** The path to the folder that will be scanned. Any downloaded charts will be added to this folder first. */
   chartFolderPath: string
 
+  /** The path to `7z.exe`, so it can be used to extract downloaded chart archives. Only used if "driveFolderLink" is defined. */
+  sevenZipPath: string
+
   /** If the charts in "chartFolderPath" should be automatically fixed if possible. */
   fixErrors: boolean
 
-  /** Downloads for files will be skipped if they are larger than this. Set to -1 for no limit. */
+  /** Downloads for files will be skipped if they are larger than this. Set to -1 for no limit. (Units are Megabytes) */
   maxDownloadSizeMB: number
 
   /** Download the contents of multiple Google Drive folders. Drive links will be parsed from the clipboard. */
@@ -45,6 +48,7 @@ export interface NamedFolderID {
 
 const defaultSettings: ScanSettings = {
   chartFolderPath: '.',
+  sevenZipPath: 'C:/Program Files/7-Zip/7z.exe',
   fixErrors: false,
   maxDownloadSizeMB: -1,
   clipboardLinksMode: false,
@@ -79,6 +83,7 @@ function readSettings() {
     }
   } catch (err) {
     console.log(redBright(err))
+    keyInPause('Press any key to close this window.', { guide: false })
     process.exit(1)
   }
 }
@@ -114,7 +119,7 @@ function getIniSettings() {
 
   const settingsIni = decode(readFileSync(SETTINGS_PATH, { encoding: 'utf8' }), { removeQuotes: true })
   if (settingsIni[$Errors]) {
-    throw `Error: invalid "settings.ini" file:\n${settingsIni[$Errors]?.join('\n')}`
+    throw `Error: Invalid "settings.ini" file:\n${settingsIni[$Errors]?.join('\n')}`
   }
 
   const validatedSettings = validateSettings(settingsIni)
@@ -147,6 +152,7 @@ function validateSettings(settingsIni: IIniObject) {
   const driveFolderID = readGeneralProperty('driveFolderLink', '', 'Google Drive link', parseDriveLink)
   settings.driveFolderIDs = driveFolderID ? [{ driveID: driveFolderID }] : undefined
   settings.chartFolderPath = readGeneralProperty('chartFolderPath', '', 'file path', parseFilepath)
+  settings.sevenZipPath = readGeneralProperty('sevenZipPath', '', 'file path', parseExistingFilepath)
   settings.fixErrors = readGeneralProperty('fixErrors', false, 'boolean value')
   settings.maxDownloadSizeMB = readGeneralProperty('maxDownloadSizeMB', 0, 'number', parseInt)
 
@@ -156,6 +162,11 @@ function validateSettings(settingsIni: IIniObject) {
     settings.minimumChartCount = readChorusProperty('minimumChartCount', 0, 'integer', parseInt)
     settings.seriousErrorThreshold = readChorusProperty('seriousErrorThreshold', 0, 'integer', parseInt)
     settings.maxDownloadsPerDrive = readChorusProperty('maxDownloadsPerDrive', 0, 'integer', parseInt)
+  }
+
+  if (settings.driveFolderIDs && !existsSync(settings.sevenZipPath ?? defaultSettings.sevenZipPath)) {
+    throw `Error: 7-Zip not found at [${settings.sevenZipPath ?? defaultSettings.sevenZipPath}].\n`
+    + `Downloading charts requires installing 7-Zip to extract downloaded files: https://www.7-zip.org/download.html`
   }
 
   if (settings.clipboardLinksMode) {

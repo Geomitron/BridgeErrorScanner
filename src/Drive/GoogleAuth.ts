@@ -83,7 +83,7 @@ export class GoogleAuth {
 
       authServer.on('authCode', async (authCode) => {
         if (authCode == null) {
-          return reject('Error: authCode was null')
+          return reject('Error: Google Drive response did not contain an "authCode" property.')
         }
         try {
           const token = (await oAuth2Client.getToken(authCode)).tokens

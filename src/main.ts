@@ -3,6 +3,7 @@ import { scanSettings } from './ScanSettings'
 import { keyInPause } from 'readline-sync'
 import { googleAuth } from './Drive/GoogleAuth'
 import { DriveScanner, generateSources } from './Drive/DriveScanner'
+import { ChartsDownloader } from './Drive/ChartDownloader'
 
 void main()
 
@@ -12,7 +13,7 @@ async function main() {
       await googleAuth.authenticate()
       const sources = await generateSources(scanSettings.driveFolderIDs)
       const driveMap = await new DriveScanner(sources).scanDrive()
-      // TODO: download charts from `driveMap`
+      await new ChartsDownloader().downloadCharts(driveMap)
     }
     // TODO: scan `scanSettings.chartFolderPath` for charts
     // TODO: generate standalone .html file that looks like the website to display the generated errors
@@ -21,6 +22,6 @@ async function main() {
     console.log(redBright(err))
   }
   if (!process.argv[2]) {
-    keyInPause()
+    keyInPause('Press any key to close this window.', { guide: false })
   }
 }
