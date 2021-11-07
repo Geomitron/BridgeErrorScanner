@@ -3,10 +3,11 @@ import { OAuth2Client } from 'google-auth-library/build/src/auth/oauth2client'
 import { Credentials } from 'google-auth-library/build/src/auth/credentials'
 import * as needle from 'needle'
 import { authServer } from './AuthServer'
-import { REDIRECT_URI, serverURL } from './paths'
-import { isFileError } from './util'
+import { REDIRECT_URI, serverURL } from '../paths'
 import { readFileSync, writeFileSync } from 'jsonfile'
 import childProcess from 'child_process'
+import { isObject } from '../Templates'
+import { green } from 'cli-color'
 
 export class GoogleAuth {
 
@@ -44,14 +45,14 @@ export class GoogleAuth {
   }
 
   /**
-   * @returns a previously stored auth token at `./token.json`, or create a new one if it doesn't exist.
-   * @throws an exception if `./token.json` could not be read, or if the connection failed.
+   * @returns a previously stored auth token at `./savedGoogleLogin.json`, or create a new one if it doesn't exist.
+   * @throws an exception if `./savedGoogleLogin.json` could not be read, or if the connection failed.
    */
   private async getToken(oAuth2Client: OAuth2Client): Promise<Credentials> {
     try {
-      return readFileSync('./token.json')
+      return readFileSync('./savedGoogleLogin.json')
     } catch (err) {
-      if (!isFileError(err) || err.code != 'ENOENT') { throw `token.json could not be accessed: ` + err }
+      if (!isObject(err, 'fileError') || err.code != 'ENOENT') { throw `savedGoogleLogin.json could not be accessed: ` + err }
     }
 
     return new Promise<Credentials>((resolve, reject) => {
@@ -66,12 +67,18 @@ export class GoogleAuth {
         })
 
         // Open authUrl in default browser
+        console.log(`\nIn order to download files, Google requires that you log in to a Google account.`)
+        console.log(`This doesn't need to be an account that owns the files if those files are publicly shared.`)
         try {
           childProcess.execSync(`powershell start-process """${authUrl}"""`)
+          console.log(`A browser window has been opened to allow you to log in.`)
         } catch (err) {
-          console.log(`Failed to open default browser.`)
+          console.log(`This application failed to open the default browser.`)
           console.log(`Authorize this app to download files by visiting ${authUrl}`)
         }
+        console.log(`\nNote: it costs a lot of money to get an application verified to do this, which I haven't done.`)
+        console.log(`Google will show you a security warning as a result.`)
+        console.log(`A throwaway account will work just as well if you prefer that option.`)
       })
 
       authServer.on('authCode', async (authCode) => {
@@ -81,10 +88,11 @@ export class GoogleAuth {
         try {
           const token = (await oAuth2Client.getToken(authCode)).tokens
           try {
-            writeFileSync('./token.json', token)
+            writeFileSync('./savedGoogleLogin.json', token)
+            console.log(green(`\nYour login token has been saved in this folder as "savedGoogleLogin.json".`))
             resolve(token)
           } catch (err) {
-            reject('Error: Failed to write token to token.json: ' + err)
+            reject('Error: Failed to write token to savedGoogleLogin.json: ' + err)
           }
         } catch (err) {
           reject('Error: Failed to get token using the auth code: ' + err)

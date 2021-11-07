@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/main.ts",
-    "build": "tsc && pkg -t latest-win-x64 -o \"release/Bridge Error Scanner.exe\" dist/main.js"
+    "build": "tsc && copy .\\src\\settings.ini .\\dist\\settings.ini && pkg -t latest-win-x64 -o \"release/Bridge Error Scanner.exe\" dist/main.js"
   },
   "author": "Geo",
   "license": "ISC",
@@ -22,6 +22,7 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
+    "bottleneck": "^2.19.5",
     "cli-color": "^2.0.1",
     "googleapis": "^89.0.0",
     "is-valid-path": "^0.1.1",

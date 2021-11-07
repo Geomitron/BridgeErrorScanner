@@ -48,20 +48,21 @@ export function decode(data: string, params?: IParseConfig) {
     if (line[0].startsWith('[')) {
       const match = sectionNameRegex.exec(line)
       if (match !== null) {
-        currentSection = match[1].trim().toLowerCase()
+        currentSection = match[1].trim()
       } else {
         (result[$Errors] ??= []).push(createParseError(line))
       }
     } else if (line.includes(delimiter)) {
       const delimeterPos = line.indexOf(delimiter)
-      const key = line.slice(0, delimeterPos).trim().toLowerCase()
-      let value = convertType(line.slice(delimeterPos + 1).trim())
+      const key = line.slice(0, delimeterPos).trim()
+      let value = line.slice(delimeterPos + 1).trim()
       if (removeQuotes) value = value.toString().replace(/^"(.*)"$/, '$1')
+      const convertedValue = convertType(value)
 
       if (currentSection !== '') {
-        (result[currentSection] ??= {})[key] = value
+        (result[currentSection] ??= {})[key] = convertedValue
       } else {
-        (result[$NoSection] ??= {})[key] = value
+        (result[$NoSection] ??= {})[key] = convertedValue
       }
     } else {
       (result[$Errors] ??= []).push(createParseError(line))

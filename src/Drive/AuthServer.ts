@@ -1,7 +1,7 @@
 import * as http from 'http'
 import { Socket } from 'net'
 import { URL } from 'url'
-import { REDIRECT_PATH, REDIRECT_BASE, SERVER_PORT } from './paths'
+import { REDIRECT_PATH, REDIRECT_BASE, SERVER_PORT } from '../paths'
 
 type EventCallback = {
   'listening': () => void
