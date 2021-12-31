@@ -3,7 +3,7 @@ import { join } from 'path'
 import { promisify } from 'util'
 import { cyan, yellow, green, redBright } from 'cli-color'
 import childProcess from 'child_process'
-import { DriveChart, DriveFile, DriveMap } from '../ScanDataInterface'
+import { DriveChart, DriveFile, DriveMap } from './DriveInterfaces'
 import { getDownloadStream } from './DriveAdapter'
 import { Progress } from '../ProgressBar'
 import { keyInPause, keyInYNStrict } from 'readline-sync'
@@ -44,7 +44,7 @@ export class ChartsDownloader {
         currentCount++
         const srcText = chartToScan.source.ownerName
         const dirText = chartToScan.folderName
-        
+
         try {
           const downloader = new ChartDownloader(chartToScan)
           if (!downloader.previouslyExists) {

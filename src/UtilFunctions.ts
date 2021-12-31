@@ -1,8 +1,24 @@
+import * as fs from 'fs'
+import * as util from 'util'
 import isValidPath from 'is-valid-path'
 import { existsSync } from 'fs'
 import { NamedFolderID } from './ScanSettings'
 import { createHash } from 'crypto'
 import sanitize from 'sanitize-filename'
+import { redBright } from 'cli-color'
+
+const readdir = util.promisify(fs.readdir)
+
+export type ValueOf<T> = T[keyof T]
+
+export async function readFolder(folderpath: string) {
+  try {
+    return await readdir(folderpath, { withFileTypes: true })
+  } catch (err) {
+    console.log(redBright(`Error: Failed to read folder at [${folderpath}]`, err))
+    throw new Error()
+  }
+}
 
 /**
  * @returns the Drive ID in `link`, or `null` if `link` wasn't a valid Google Drive link.
@@ -78,16 +94,6 @@ export function parseDriveLinksText(clipboardText: string) {
 }
 
 /**
- * @returns `true` if the list of filename `extensions` appears to be intended as a chart folder.
- */
-export function appearsToBeChartFolder(extensions: string[]) {
-  const ext = extensions.map(extension => lower(extension))
-  const containsNotes = (ext.includes('chart') || ext.includes('mid'))
-  const containsAudio = (ext.includes('ogg') || ext.includes('mp3') || ext.includes('wav') || ext.includes('opus'))
-  return (containsNotes || containsAudio)
-}
-
-/**
  * @returns `filename` with all invalid filename characters replaced.
  */
  export function sanitizeFilename(filename: string): string {
@@ -111,6 +117,20 @@ export function appearsToBeChartFolder(extensions: string[]) {
 }
 
 /**
+ * @returns `text` with all style tags removed. (e.g. "<color=#AEFFFF>Aren Eternal</color> & Geo" -> "Aren Eternal & Geo")
+ */
+ export function removeStyleTags(text: string) {
+  let oldText = text
+  let newText = text
+  do {
+    oldText = newText
+    newText = newText.replace(/<\s*[^>]+>(.*?)<\s*\/\s*[^>]+>/g, '$1')
+    newText = newText.replace(/<\s*\/\s*[^>]+>(.*?)<\s*[^>]+>/g, '$1')
+  } while (newText != oldText)
+  return newText
+}
+
+/**
  * @returns `https://drive.google.com/open?id=${fileID}`
  */
 export function driveLink(fileID: string) {
@@ -122,4 +142,11 @@ export function driveLink(fileID: string) {
  */
 export function lower(text: string) {
   return text.toLowerCase()
+}
+
+/**
+ * @returns `true` if `value` is an array of `T` items.
+ */
+export function isArray<T>(value: T | readonly T[]): value is readonly T[] {
+  return Array.isArray(value)
 }

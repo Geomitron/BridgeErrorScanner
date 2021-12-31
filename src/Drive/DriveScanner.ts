@@ -1,11 +1,12 @@
-import { DriveMap, DriveFile, Source, DriveChart } from '../ScanDataInterface'
+import { DriveMap, DriveFile, Source, DriveChart } from './DriveInterfaces'
 import { readDriveFolder, readDriveFile } from './DriveAdapter'
 import { createHash } from 'crypto'
 import { green, magentaBright, yellow } from 'cli-color'
-import { appearsToBeChartFolder, driveLink, lower } from '../UtilFunctions'
+import { driveLink, lower } from '../UtilFunctions'
 import { DriveFileResponse, DriveFolderResponse, DriveShortcutResponse } from '../Templates'
 import { NamedFolderID, scanSettings } from '../ScanSettings'
 import { keyInYNStrict } from 'readline-sync'
+import { appearsToBeChartFolder } from '../Chart/ChartUtils'
 
 interface DrivePair {
   id: string

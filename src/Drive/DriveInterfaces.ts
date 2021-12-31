@@ -1,4 +1,4 @@
-import { NamedFolderID } from './ScanSettings'
+import { NamedFolderID } from '../ScanSettings'
 
 export interface DriveMap {
   [driveID: string]: ChartMap

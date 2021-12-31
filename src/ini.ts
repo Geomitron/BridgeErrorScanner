@@ -56,7 +56,7 @@ export function decode(data: string, params?: IParseConfig) {
       const delimeterPos = line.indexOf(delimiter)
       const key = line.slice(0, delimeterPos).trim()
       let value = line.slice(delimeterPos + 1).trim()
-      if (removeQuotes) value = value.toString().replace(/^"(.*)"$/, '$1')
+      if (removeQuotes) value = value.toString().replace(/^"(.*)"$/, '$1').trim()
       const convertedValue = convertType(value)
 
       if (currentSection !== '') {
@@ -104,11 +104,8 @@ export function encode(iniObject: IIniObject, params?: IStringifyConfig) {
 }
 
 function convertType(value: string): IniValue {
-  if (value === 'true' || value === 'false') {
-    return value === 'true'
-  }
-  if (value === '') {
-    return true
+  if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+    return value.toLowerCase() === 'true'
   }
   if (!isNaN(parseFloat(value))) {
     return parseFloat(value)

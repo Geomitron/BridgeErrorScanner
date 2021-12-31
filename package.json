@@ -18,20 +18,24 @@
     "@types/node": "^16.11.6",
     "@types/progress": "^2.0.5",
     "@types/readline-sync": "^1.4.4",
+    "@types/sharp": "^0.29.3",
     "pkg": "^5.4.1",
     "ts-node": "^10.4.0",
     "typescript": "^4.4.4"
   },
   "dependencies": {
     "bottleneck": "^2.19.5",
+    "chardet": "^1.4.0",
     "cli-color": "^2.0.1",
     "googleapis": "^89.0.0",
     "is-valid-path": "^0.1.1",
     "jsonfile": "^6.1.0",
+    "midifile": "^2.0.0",
     "mkdirp": "^1.0.4",
     "needle": "^3.0.0",
     "progress": "^2.0.3",
     "readline-sync": "^1.4.10",
-    "sanitize-filename": "^1.6.3"
+    "sanitize-filename": "^1.6.3",
+    "sharp": "^0.29.2"
   }
 }
